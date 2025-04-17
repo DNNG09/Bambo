@@ -1,0 +1,17 @@
+2025-04-17 18:54:59,228 - INFO - info - 1744908899.228719
+2025-04-17 18:54:59,229 - WARNING - warning - 1744908899.229719
+2025-04-17 18:54:59,229 - ERROR - error - 1744908899.229719
+2025-04-17 18:54:59,229 - CRITICAL - critical - 1744908899.229719
+2025-04-17 18:54:59,231 - WARNING - PyNaCl is not installed, voice will NOT be supported - 1744908899.231150
+2025-04-17 18:54:59,231 - INFO - Database still active - 1744908899.231150
+2025-04-17 18:54:59,234 - INFO - Serverlogging Loaded - 1744908899.234665
+2025-04-17 18:54:59,236 - INFO - Moderation Cog Loaded - 1744908899.236664
+2025-04-17 18:54:59,237 - INFO - Serverlogging Loaded - 1744908899.237664
+2025-04-17 18:54:59,238 - INFO - Messages Loaded - 1744908899.238665
+2025-04-17 18:54:59,238 - INFO - Counting Loaded - 1744908899.238665
+2025-04-17 18:54:59,239 - INFO - Bump Loaded - 1744908899.239664
+2025-04-17 18:54:59,241 - INFO - Pollmaker Loaded - 1744908899.241044
+2025-04-17 18:54:59,241 - INFO - logging in using static token - 1744908899.241044
+2025-04-17 18:54:59,801 - INFO - Shard ID None has sent the IDENTIFY payload. - 1744908899.801514
+2025-04-17 18:55:00,102 - INFO - Shard ID None has connected to Gateway: ["gateway-prd-us-east1-d-fh2v",{"micros":200285,"calls":["id_created",{"micros":704,"calls":[]},"session_lookup_time",{"micros":1677,"calls":[]},"session_lookup_finished",{"micros":17,"calls":[]},"discord-sessions-prd-2-141",{"micros":197261,"calls":["start_session",{"micros":84314,"calls":["discord-api-rpc-744d888fdb-n9jxn",{"micros":76303,"calls":["get_user",{"micros":22472},"get_guilds",{"micros":22698},"send_scheduled_deletion_message",{"micros":4},"guild_join_requests",{"micros":414},"authorized_ip_coro",{"micros":8},"pending_payments",{"micros":570},"apex_user_experiments",{"micros":2}]}]},"starting_guild_connect",{"micros":26,"calls":[]},"presence_started",{"micros":2505,"calls":[]},"guilds_started",{"micros":105,"calls":[]},"lobbies_started",{"micros":1,"calls":[]},"guilds_connect",{"micros":1,"calls":[]},"presence_connect",{"micros":110295,"calls":[]},"connect_finished",{"micros":110298,"calls":[]},"build_ready",{"micros":10,"calls":[]},"clean_ready",{"micros":0,"calls":[]},"optimize_ready",{"micros":1,"calls":[]},"split_ready",{"micros":0,"calls":[]}]}]}] (Session ID: 146f027d28a196c549f02abcf9e30cc7, Resume URL: wss://gateway-us-east1-d.discord.gg). - 1744908900.102824
+2025-04-17 18:55:02,503 - INFO - Bambo is online - 1744908902.503427

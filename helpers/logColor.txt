@@ -1,0 +1,11 @@
+Members:
+    disnake.Colour.dark_purple()
+
+Bot actions:
+    disnake.Color.green()
+
+Guild:
+    disnake.Colour.red()
+
+Voice Channels:
+    disnake.Colour.yellow()
