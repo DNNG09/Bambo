@@ -1,11 +1,11 @@
-Members:
-    disnake.Colour.dark_purple()
-
-Bot actions:
-    disnake.Color.green()
-
-Guild:
-    disnake.Colour.red()
-
-Voice Channels:
-    disnake.Colour.yellow()
+Category | Applies to | Color Name | disnake.Color
+✅ Status / Startup | on_ready() (bot startup) | Green | disnake.Color.green()
+🟦 Messages | Message Delete, Message Edit | Blue | disnake.Color.blue()
+🟨 Invites | Invite Created/Deleted | Gold | disnake.Color.gold()
+🟦 Users | Member Join, Leave, Role Updates | Blurple (blue-purple) | disnake.Color.blurple()
+🟥 Roles | Role Create, Update, Delete | Red | disnake.Color.red()
+🟩 Voice Channel Moves | Join, Leave, Move between voice channels | Teal | disnake.Color.teal()
+🟧 Microphone | Mute / Unmute | Orange | disnake.Color.orange()
+🟫 Headphones | Deafened / Undeafened | Dark Orange | disnake.Color.dark_orange()
+🟪 Camera | Video On / Off | Magenta / Purple | disnake.Color.magenta()
+🟩 Screenshare | Start / Stop Screen Share | Dark Green | disnake.Color.dark_green()
