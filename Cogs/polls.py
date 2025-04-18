@@ -2,7 +2,6 @@ import disnake
 from disnake.ext import commands, tasks
 from disnake.ext.commands import has_any_role
 from disnake.ui import View, Button, Select
-from env import Roles
 import datetime as dt
 import logging
 
