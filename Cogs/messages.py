@@ -1,10 +1,13 @@
 import disnake
 from disnake.ext import commands
-from env import Guild_Data
+from dotenv import load_dotenv
+import os
 
 bot = commands.Bot(intents=disnake.Intents.all())
 intents = disnake.Intents.default()
 intents.messages = True
+
+load_dotenv()
 
 class Messages(commands.Cog):
     def __init__(self, bot):

@@ -1,6 +1,9 @@
 import disnake
 from disnake.ext import commands
-from env import Roles
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
 
 bot = commands.Bot(intents=disnake.Intents.all())
 intents = disnake.Intents.default()
@@ -9,7 +12,7 @@ intents.messages = True
 class AntiBot(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.role_to_kick_id = Roles.anti_bot
+        self.role_to_kick_id = os.getenv('anti_bot')
         print("Anti Bot Cog is loaded")
 
     @commands.Cog.listener()

@@ -1,13 +1,16 @@
 import disnake
 from disnake.ext import commands
-from env import Channels
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
 
 class Counting(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.last_number = 0
         self.last_user_id = None
-        self.channel_id = Channels.counting
+        self.channel_id =  os.getenv('counting')
 
     @commands.Cog.listener()
     async def on_message(self, message: disnake.Message):

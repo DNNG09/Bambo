@@ -1,13 +1,16 @@
-from env import Database_Data
 import mysql.connector
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
 
 class Database:
     try: 
         db = mysql.connector.connect(
-            host = Database_Data.DATABASE_HOST,
-            user = Database_Data.DATABASE_USER,
-            password = Database_Data.DATABASE_PASSWORD,
-            database = Database_Data.DATABASE_NAME,
+            host = os.getenv('DATABASE_HOST'),
+            user = os.getenv('DATABASE_USER'),
+            password = os.getenv('DATABASE_PASSWORD'),
+            database = os.getenv('DATABASE_NAME'),
             auth_plugin="mysql_native_password"
         )
         cursor = db.cursor(buffered=True)

@@ -1,9 +1,12 @@
 import disnake
 from disnake.ext import commands
 from disnake.ext.commands import has_any_role
-from env import Roles
+from dotenv import load_dotenv
+import os
 import datetime as dt
 import helpers.logs
+
+load_dotenv()
 
 class Moderation(commands.Cog):
     def __init__(self, bot):
@@ -12,7 +15,7 @@ class Moderation(commands.Cog):
 
     # KICK
     @commands.slash_command(description="Kick a user from the server as an admin")
-    @has_any_role(Roles.admin_1, Roles.admin_2)
+    @has_any_role(os.getenv('admin_1'), os.getenv('admin_2'))
     async def kick(self, inter: disnake.ApplicationCommandInteraction, member: disnake.Member, reason: str):
         class KickConfirm(disnake.ui.View):
             @disnake.ui.button(label="✅ Bevestig kick", style=disnake.ButtonStyle.danger)
@@ -34,7 +37,7 @@ class Moderation(commands.Cog):
 
     # BAN
     @commands.slash_command(description="Ban een lid uit de server.")
-    @has_any_role(Roles.admin_1, Roles.admin_2)
+    @has_any_role(os.getenv('admin_1'), os.getenv('admin_2'))
     async def ban(self, inter: disnake.ApplicationCommandInteraction, member: disnake.Member, reason: str):
         class BanConfirm(disnake.ui.View):
             @disnake.ui.button(label="✅ Bevestig ban", style=disnake.ButtonStyle.danger)
@@ -56,7 +59,7 @@ class Moderation(commands.Cog):
 
     # SOFTBAN
     @commands.slash_command(description="Softban (ban en unban om berichten te verwijderen).")
-    @has_any_role(Roles.admin_1, Roles.admin_2)
+    @has_any_role(os.getenv('admin_1'), os.getenv('admin_2'))
     async def softban(self, inter: disnake.ApplicationCommandInteraction, member: disnake.Member, reason: str):
         class SoftbanConfirm(disnake.ui.View):
             @disnake.ui.button(label="✅ Bevestig softban", style=disnake.ButtonStyle.danger)
@@ -82,7 +85,7 @@ class Moderation(commands.Cog):
 
     # MUTE
     @commands.slash_command(description="Mute een lid tijdelijk via timeout.")
-    @has_any_role(Roles.admin_1, Roles.admin_2)
+    @has_any_role(os.getenv('admin_1'), os.getenv('admin_2'))
     async def mute(self, inter: disnake.ApplicationCommandInteraction, member: disnake.Member, duration_minutes: int, reason: str):
         until = dt.datetime.now() + dt.timedelta(minutes=duration_minutes)
         try:
@@ -109,7 +112,7 @@ class Moderation(commands.Cog):
 
     # WARN
     @commands.slash_command(description="Geef een waarschuwing aan een lid.")
-    @has_any_role(Roles.admin_1, Roles.admin_2)
+    @has_any_role(os.getenv('admin_1'), os.getenv('admin_2'))
     async def warn(self, inter: disnake.ApplicationCommandInteraction, member: disnake.Member, reason: str):
         try:
             await member.send(f"⚠️ {member}, je bent gewaarschuwd in **{inter.guild.name}**:\n{reason}")

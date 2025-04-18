@@ -1,4 +1,4 @@
 disnake
 mysql.connector
 datetime
-logging
+python-dotenv

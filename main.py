@@ -1,9 +1,12 @@
 import disnake
 from disnake.ext import commands, tasks
-from env import *
+from dotenv import load_dotenv
 from database import Database
 import logging
 import helpers.logs
+import os
+
+load_dotenv()
 
 bot = commands.Bot(intents=disnake.Intents.all())
 
@@ -42,10 +45,10 @@ bot.load_extension('Cogs.messages')
 logging.info("Messages Loaded")
 bot.load_extension('Cogs.counting')
 logging.info("Counting Loaded")
-bot.load_extension('Cogs.bump')
+#bot.load_extension('Cogs.bump')
 logging.info("Bump Loaded")
 bot.load_extension('Cogs.polls')
 logging.info("Pollmaker Loaded")
 
 
-bot.run(Secrets.TOKEN)
+bot.run(os.getenv('TOKEN'))

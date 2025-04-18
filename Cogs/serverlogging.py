@@ -1,11 +1,14 @@
 import disnake
 from disnake.ext import commands
-from env import Guild_Data, Channels
+from dotenv import load_dotenv
+import os
 import datetime as dt
 import logging
 
 client = disnake.client
 bot = commands.Bot(intents=disnake.Intents.all())
+
+load_dotenv()
 
 user = disnake.guild.User
 
@@ -15,23 +18,23 @@ class Serverlogging(commands.Cog):
         print("Logging Cog is loaded!")
 
     async def send_to_log(self, message=None, embed=None):
-        channel = await self.bot.fetch_channel(Channels.log_channel)
+        channel = await self.bot.fetch_channel(os.getenv('log_channel'))
         await channel.send(content=message, embed=embed)
     
     async def welcome_func(self, message=None, embed=None):
-        channel = await self.bot.fetch_channel(Channels.welcome_channel)
+        channel = await self.bot.fetch_channel(os.getenv('welcome_channel'))
         await channel.send(content=message, embed=embed)
 
     @commands.Cog.listener()
     async def on_ready(self):
         embed = disnake.Embed(
-            title=f"{Guild_Data.bot_Name} activated",
-            description=f"{Guild_Data.bot_Name} says **Hi!** \nThis is version {Guild_Data.version}. \nGuild name: {Guild_Data.guild_name}",
+            title=f"{os.getenv('bot_Name')} activated",
+            description=f"{os.getenv('bot_Name')} says **Hi!** \nThis is version {os.getenv('version')}. \nGuild name: {os.getenv('guild_name')}",
             color=disnake.Color.green(),  # ✅ Startup / status
             timestamp=dt.datetime.now()
         )
         await self.send_to_log(embed=embed)
-        logging.info(f"{Guild_Data.bot_Name} is online")
+        logging.info(f"{os.getenv('bot_Name')} is online")
 
     @commands.Cog.listener()
     async def on_message_delete(self, message):
@@ -78,7 +81,7 @@ class Serverlogging(commands.Cog):
     async def on_member_join(self, member):
         embed = disnake.Embed(
             title="New Guild member detected!",
-            description=f"New user has joined {Guild_Data.guild_name}. Give them a warm welcome in the welcome channel",
+            description=f"New user has joined {os.getenv('guild_name')}. Give them a warm welcome in the welcome channel",
             color=disnake.Color.blurple(),  # 🟦 Member changes
             timestamp=dt.datetime.now()
         )
@@ -99,7 +102,7 @@ class Serverlogging(commands.Cog):
     async def on_member_remove(self, member):
         embed = disnake.Embed(
             title=f"Guild member left: {member.name}",
-            description=f"Someone decided that they didn't like us enough and decided to leave {Guild_Data.guild_name}.",
+            description=f"Someone decided that they didn't like us enough and decided to leave {os.getenv('guild_name')}.",
             color=disnake.Color.blurple(),  # 🟦 Member changes
             timestamp=dt.datetime.now()
         )
