@@ -1,27 +1,27 @@
 from disnake.ext import commands, tasks
-from env import Channels
 from datetime import datetime, timedelta, timezone
+import os
 
 
 class BumpReminder(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.last_bump_time = None
-        self.bump_channel_id = Channels.bump
+        self.bump_channel_id = os.getenv('bump')
         self.bump_interval = timedelta(hours=2)
         print("Loaded Cog bump")
 
     async def send_to_log(self, message=None, embed=None):
-        channel = await self.bot.fetch_channel(Channels.log_channel)
+        channel = os.getenv('LOG_CHANNEL')
         await channel.send(content=message, embed=embed)
     
     async def send_to_bump(self, message=None, embed=None):
-        channel = await self.bot.fetch_channel(Channels.bump)
+        channel = channel = os.getenv('bump')
         await channel.send(content=message, embed=embed)
 
     @tasks.loop(minutes=5)
     async def check_bump(self):
-        channel = Channels.bump
+        channel = os.getenv('bump')
         if not channel:
             self.send_to_log("Error in check_bump: Channel not found")
             return

@@ -49,6 +49,8 @@ logging.info("Counting Loaded")
 logging.info("Bump Loaded")
 bot.load_extension('Cogs.polls')
 logging.info("Pollmaker Loaded")
+bot.load_extension('Cogs.qotd')
+logging.info("QOTD Loaded")
 
 
 bot.run(os.getenv('TOKEN'))

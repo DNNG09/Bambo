@@ -38,6 +38,7 @@ class Serverlogging(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message_delete(self, message):
+        roles = os.getenv('admin_1'), os.getenv('admin_2'), os.getenv('bots')
         print("Message Deleted")
         embed = disnake.Embed(
             title="Message Removed",
@@ -45,13 +46,15 @@ class Serverlogging(commands.Cog):
             color=disnake.Color.blue(),  # 🟦 Messages
             timestamp=dt.datetime.now()
         )
-        await self.send_to_log(embed=embed)
-    
+        for role in roles:
+            if role not in roles:
+                await self.send_to_log(embed=embed)
+            
     @commands.Cog.listener()
     async def on_message_edit(self, before, after):
         embed = disnake.Embed(
-            title="Message Edit",
-            description=f"{before.content} is changed into {after.content}",
+            title=f"Message changed in: {before.channel} \n Changed bij {before.author}",
+            description=f"Message before: {before.content} \nMessage after: {after.content}",
             color=disnake.Color.blue(),  # 🟦 Messages
             timestamp=dt.datetime.now()
         )

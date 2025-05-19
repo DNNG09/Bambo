@@ -26,7 +26,7 @@ class Messages(commands.Cog):
         for i in invites:
             if i in (message.content).lower():
                 await message.reply("Are you looking for the invite link to this server?")
-                await message.reply(f"The link to this server is: {Guild_Data.invite}")
+                await message.reply(f"The link to this server is: {os.getenv('invite')}")
 
 
 def setup(bot):
