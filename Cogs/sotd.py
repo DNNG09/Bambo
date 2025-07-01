@@ -16,7 +16,7 @@ class StatementOfTheDay(commands.Cog):
         
         load_dotenv()
 
-        self.sotd_channel_id = int(os.getenv('SOTD_CHANNEL_ID'))  # bijv. 123456789012345678
+        self.sotd_channel_id = os.getenv('SOTD_CHANNEL_ID')  # bijv. 123456789012345678
         self.sent_today = None  # om dubbele berichten te voorkomen
         self.send_message.start()
         self.sotd_loop.start()
