@@ -1,24 +1,30 @@
 import disnake
-import requests
 from disnake.ext import commands, tasks
 import os
-from dotenv import load_dotenv
 import random
-import logging
 from datetime import datetime
+from dotenv import load_dotenv
 
-class QOTD(commands.Cog):
+bot = commands.InteractionBot(intents=disnake.Intents.all())
+intents = disnake.Intents.default()
+intents.messages = True
+
+class StatementOfTheDay(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.qotd_channel_id = os.getenv('qotd')
-        self.qotd_channel = None
-        print("QOTD Cog is loaded!")
 
         
-    today = datetime.today()
-    current_time = today.strftime("%H:%M")
+        load_dotenv()
 
-    questions = [
+        self.sotd_channel_id = int(os.getenv('SOTD_CHANNEL_ID'))  # bijv. 123456789012345678
+        self.sent_today = None  # om dubbele berichten te voorkomen
+        self.send_message.start()
+        self.sotd_loop.start()
+
+        print("StatementOfTheDay Cog is loaded!")
+
+
+    statements = [
             "Geluk is een keuze.",
             "Moet iedereen verantwoordelijk zijn voor zijn eigen geluk, of heeft de samenleving hier ook een rol in?",
             "Kun je pas echt gelukkig zijn als je anderen gelukkig maakt?",
@@ -113,23 +119,37 @@ class QOTD(commands.Cog):
         ]
 
 
-    @tasks.loop(minutes=1)
-    async def qotd_loop(self):
-        now = datetime.now()
-        current_time = now.strftime("%H:%M")
+    @tasks.loop(seconds=60)
+    async def send_message(self):
+        channel = self.bot.get_channel(self.sotd_channel_id)
+        if channel:
+            return
+        else:
+            print("Kanaal niet gevonden voor Stelling van de dag.")
 
-        if current_time == "19:45" and now.date() != self.sent_today:
-            question = random.choice(self.questions)
-            channel = self.bot.get_channel(self.qotd_channel_id)
+
+    @tasks.loop(seconds=5)
+    async def sotd_loop(self):
+        now = datetime.now()
+        if now.strftime("%H:%M") == "18:08" and now.date() != self.sent_today:
+            channel = self.bot.get_channel(self.sotd_channel_id)
             if channel:
-                await channel.send(f"📢 **Vraag van de dag:**\n{question}")
+                statement = random.choice(self.statements)
+                await channel.send(f"📢 **Stelling van de dag:**\n{statement}")
                 self.sent_today = now.date()
             else:
-                print("Kanaal niet gevonden voor QOTD.")
+                print("Kanaal niet gevonden voor Stelling van de dag.")
 
-    @qotd_loop.before_loop
-    async def before_qotd_loop(self):
-        await self.bot.wait_until_ready()
+
+    @commands.slash_command(name="test_sotd", description="Stuur handmatig een stelling van de dag (alleen voor mods)")
+    async def test_sotd(self, inter: disnake.ApplicationCommandInteraction):
+        mod_role = disnake.utils.get(inter.guild.roles, name="ADMIN_1")  
+
+        if mod_role in inter.author.roles:
+            statement = random.choice(self.statements)
+            await inter.response.send_message(f"📢 **Stelling van de dag (handmatig):**\n{statement}")
+        else:
+            await inter.response.send_message("⛔ Je hebt hier geen toestemming voor.", ephemeral=True)
 
 def setup(bot):
-    bot.add_cog(QOTD(bot))
+    bot.add_cog(StatementOfTheDay(bot))

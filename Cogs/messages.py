@@ -3,9 +3,8 @@ from disnake.ext import commands
 from dotenv import load_dotenv
 import os
 
-bot = commands.Bot(intents=disnake.Intents.all())
-intents = disnake.Intents.default()
-intents.messages = True
+client = commands.InteractionBot(intents=disnake.Intents.all())
+bot = commands.InteractionBot(intents=disnake.Intents.all())
 
 load_dotenv()
 
@@ -19,14 +18,15 @@ class Messages(commands.Cog):
         if message.author.bot: 
             return
 
-        print(f"Message from {message.author}: {message.content}")
+        #print(f"Message from {message.author}: {message.content}")
 
         invites = ["invite", "invitelink", "uitnodiging", "uitnodigingslink"]
+        invite = os.getenv('INVITE_LINK')
         
         for i in invites:
             if i in (message.content).lower():
-                await message.reply("Are you looking for the invite link to this server?")
-                await message.reply(f"The link to this server is: {os.getenv('invite')}")
+                await message.reply("Leuk dat je de gezelligheid nog groter wilt maken! Hier is de link naar deze server:")
+                await message.reply(f"The link to this server is: {invite}")
 
 
 def setup(bot):
