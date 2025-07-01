@@ -8,7 +8,8 @@ import os
 
 load_dotenv()
 
-bot = commands.Bot(intents=disnake.Intents.all())
+client = commands.InteractionBot(intents=disnake.Intents.all())
+bot = commands.InteractionBot(intents=disnake.Intents.all())
 
 @bot.event
 async def on_ready():
