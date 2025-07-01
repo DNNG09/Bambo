@@ -125,8 +125,7 @@ class StatementOfTheDay(commands.Cog):
         if channel:
             return
         else:
-            print("Kanaal niet gevonden voor Stelling van de dag.")
-
+            return
 
     @tasks.loop(seconds=5)
     async def sotd_loop(self):
