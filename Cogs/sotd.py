@@ -136,8 +136,6 @@ class StatementOfTheDay(commands.Cog):
                 statement = random.choice(self.statements)
                 await channel.send(f"📢 **Stelling van de dag:**\n{statement}")
                 self.sent_today = now.date()
-            else:
-                print("Kanaal niet gevonden voor Stelling van de dag.")
 
 
     @commands.slash_command(name="test_sotd", description="Stuur handmatig een stelling van de dag (alleen voor mods)")

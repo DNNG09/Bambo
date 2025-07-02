@@ -103,7 +103,10 @@ class Serverlogging(commands.Cog):
         embed.add_field(name="Channel", value=before.channel.mention, inline=True)
         embed.add_field(name="Message ID", value=before.id, inline=True)
 
-        await self.send_to_log(embed=embed)
+        if before.channel == os.getenv('LOG_CHANNEL'):
+            return
+        else:
+            await self.send_to_log(embed=embed)
 
     @commands.Cog.listener()
     async def on_invite_create(self, invite):
