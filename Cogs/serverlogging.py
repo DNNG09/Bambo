@@ -4,7 +4,7 @@ import datetime as dt
 import os
 from dotenv import load_dotenv
 
-load_dotenv()  # laad .env-variabelen
+load_dotenv()
 
 class Serverlogging(commands.Cog):
     def __init__(self, bot):
@@ -28,7 +28,6 @@ class Serverlogging(commands.Cog):
                 await channel.send(content=message, embed=embed)
             except Exception as e:
                 print(f"❌ Error sending to welcome channel: {e}")
-
 
     @commands.Cog.listener()
     async def on_ready(self):
@@ -55,11 +54,14 @@ class Serverlogging(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message_delete(self, message):
-        roles = os.getenv('developer'), os.getenv('bots')
-        print("Message Deleted")
+        print("🗑️ Message Deleted")
+        content = message.content or "*Empty*"
+        if len(content) > 1024:
+            content = content[:1021] + "..."
+
         embed = disnake.Embed(
             title="🗑️ Message Deleted",
-            description=f"{message.content} deleted by {message.author}",
+            description=f"Deleted by: {message.author}",
             color=disnake.Color.blue(),
             timestamp=dt.datetime.now()
         )
@@ -68,7 +70,7 @@ class Serverlogging(commands.Cog):
         embed.add_field(name="Author", value=message.author.mention, inline=True)
         embed.add_field(name="Channel", value=message.channel.mention, inline=True)
         embed.add_field(name="Message ID", value=message.id, inline=True)
-        embed.add_field(name="Message Content", value=message.content, inline=False)
+        embed.add_field(name="Message Content", value=content, inline=False)
         embed.add_field(name="Message Link", value=f"[Jump to message](https://discord.com/channels/{message.guild.id}/{message.channel.id}/{message.id})", inline=False)
 
         await self.send_to_log(embed=embed)
@@ -77,6 +79,14 @@ class Serverlogging(commands.Cog):
     async def on_message_edit(self, before, after):
         if before.content == after.content:
             return
+
+        content_before = before.content or "*Empty*"
+        content_after = after.content or "*Empty*"
+        if len(content_before) > 1024:
+            content_before = content_before[:1021] + "…"
+        if len(content_after) > 1024:
+            content_after = content_after[:1021] + "…"
+
         embed = disnake.Embed(
             title="✏️ Message Edited",
             description=f"Edited by: {before.author}",
@@ -85,8 +95,8 @@ class Serverlogging(commands.Cog):
         )
         embed.set_author(name=before.author.name, icon_url=before.author.display_avatar.url)
         embed.set_thumbnail(url=before.author.display_avatar.url)
-        embed.add_field(name="Before", value=before.content or "*Empty*", inline=False)
-        embed.add_field(name="After", value=after.content or "*Empty*", inline=False)
+        embed.add_field(name="Before", value=content_before, inline=False)
+        embed.add_field(name="After", value=content_after, inline=False)
         embed.add_field(name="Author", value=before.author.mention, inline=True)
         embed.add_field(name="Channel", value=before.channel.mention, inline=True)
         embed.add_field(name="Message ID", value=before.id, inline=True)
@@ -129,8 +139,8 @@ class Serverlogging(commands.Cog):
 
     @commands.Cog.listener()
     async def on_voice_state_update(self, member, before, after):
-        # ... jouw originele voice logic blijft geldig hier ...
-        pass  # vanwege lengte, dit blijft hetzelfde
+        # Optioneel: hier kun je voice join/leave logica toevoegen
+        pass
 
 def setup(bot):
     bot.add_cog(Serverlogging(bot))
