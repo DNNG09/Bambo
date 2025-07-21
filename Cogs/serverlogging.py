@@ -12,7 +12,7 @@ class Serverlogging(commands.Cog):
         print("✅ Logging Cog loaded!")
 
     async def send_to_log(self, message=None, embed=None):
-        channel_id = os.getenv("SERVER_LOGGING_CHANNEL")
+        channel_id = os.getenv("LOG_CHANNEL")
         if channel_id:
             channel = self.bot.get_channel(int(channel_id))
             if channel:
