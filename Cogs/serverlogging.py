@@ -14,16 +14,21 @@ class Serverlogging(commands.Cog):
     async def send_to_log(self, message=None, embed=None):
         channel_id = os.getenv("LOG_CHANNEL")
         if channel_id:
-            channel = self.bot.get_channel(int(channel_id))
-            if channel:
+            try:
+                channel = await self.bot.fetch_channel(int(channel_id))
                 await channel.send(content=message, embed=embed)
+            except Exception as e:
+                print(f"❌ Error sending to log channel: {e}")
 
     async def welcome_func(self, message=None, embed=None):
         channel_id = os.getenv("WELCOME_CHANNEL")
         if channel_id:
-            channel = self.bot.get_channel(int(channel_id))
-            if channel:
+            try:
+                channel = await self.bot.fetch_channel(int(channel_id))
                 await channel.send(content=message, embed=embed)
+            except Exception as e:
+                print(f"❌ Error sending to welcome channel: {e}")
+
 
     @commands.Cog.listener()
     async def on_ready(self):
