@@ -44,7 +44,7 @@ class Serverlogging(commands.Cog):
         embed.add_field(name="Guild Name", value=guild_name, inline=True)
         embed.add_field(name="Bot Link", value=f"[Jump to bot](https://discord.com/users/{self.bot.user.id})", inline=False)
         embed.set_footer(text=f"Started at {dt.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-        embed.set_image(url="https://tse1.mm.bing.net/th/id/OIP.srURzxmTuFsEZQ4qzpyNDgHaHa?rs=1&pid=ImgDetMain&o=7&rm=3")
+        embed.set_image(url=self.bot.user.display_avatar.url)
 
         await self.send_to_log(embed=embed)
 
