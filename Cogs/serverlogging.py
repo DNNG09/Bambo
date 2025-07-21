@@ -56,7 +56,7 @@ class Serverlogging(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message_delete(self, message):
-        roles = os.getenv('admin_1'), os.getenv('admin_2'), os.getenv('bots')
+        roles = os.getenv('developer'), os.getenv('bots')
         print("Message Deleted")
         embed = disnake.Embed(
             title="Message Removed",

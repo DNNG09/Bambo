@@ -3,43 +3,67 @@ from disnake.ext import commands
 from dotenv import load_dotenv
 import os
 
-client = commands.InteractionBot(intents=disnake.Intents.all())
-bot = commands.InteractionBot(intents=disnake.Intents.all())
-
 load_dotenv()
+
+bot = commands.InteractionBot(intents=disnake.Intents.all())
 
 class Counting(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        self.channel_id = int(os.getenv('COUNTING'))
         self.last_number = 0
         self.last_user_id = None
-        self.channel_id = int(os.getenv('COUNTING'))
+
+    @commands.Cog.listener()
+    async def on_ready(self):
+        channel = self.bot.get_channel(self.channel_id)
+        if not channel:
+            print("Channel not found!")
+            return
+
+        async for message in channel.history(limit=50):
+            try:
+                number = int(message.content.strip())
+            except ValueError:
+                continue
+
+            self.last_number = number
+            self.last_user_id = message.author.id
+            break
+        print(f"Counting cog is ready. Last number: {self.last_number}, Last user ID: {self.last_user_id}")
+        await channel.send(f"🔢 Counting game is back online! Laatste getal was: **{self.last_number}**")
 
     @commands.Cog.listener()
     async def on_message(self, message: disnake.Message):
         if message.author.bot:
             return
 
-        if self.channel_id and message.channel.id != self.channel_id:
+        if message.channel.id != self.channel_id:
             return
 
         try:
             number = int(message.content.strip())
         except ValueError:
-            return  
+            return
 
-        # Check of het nummer klopt en de gebruiker niet dezelfde is als de vorige
-        if number == self.last_number + 1 and message.author.id != self.last_user_id:
-            await message.add_reaction("✅")
-            self.last_number = number
-            self.last_user_id = message.author.id
-        else:
+        if message.author.id == self.last_user_id:
             await message.add_reaction("❌")
-            await message.reply("This is not the correct number or you can't count twice in a row.\nYou need to start all over again.")
+            await message.reply("❌ Je kunt niet twee keer achter elkaar tellen!\n🔁 De telling is gereset.")
             self.last_number = 0
             self.last_user_id = None
+            return
 
+        if number != self.last_number + 1:
+            await message.add_reaction("❌")
+            await message.reply(f"❌ Verkeerd getal! Het volgende juiste nummer was **{self.last_number + 1}**.\n🔁 De telling is gereset.")
+            self.last_number = 0
+            self.last_user_id = None
+            return
 
+        # Alles is correct
+        self.last_number = number
+        self.last_user_id = message.author.id
+        await message.add_reaction("✅")
 
 
 def setup(bot):
