@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 GUILD_ID = int(os.getenv("GUILD_ID"))
-TICKET_CATEGORY_ID = int(os.getenv("TICKET_CATEGORY_ID"))
+TICKET_CATEGORY_ID = str(os.getenv("TICKET_CATEGORY_ID"))
 SUPPORT_ROLE_ID = int(os.getenv("SUPPORT_ROLE_ID"))
 TICKET_LOG_CHANNEL_ID = int(os.getenv("TICKET_LOG_CHANNEL_ID"))
 
