@@ -1,228 +1,166 @@
 import disnake
 from disnake.ext import commands
-import datetime as dt
-import os
 from dotenv import load_dotenv
+import os
+from datetime import datetime
 
 load_dotenv()
 
-class Serverlogging(commands.Cog):
+class ServerLogging(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         print("✅ Logging Cog loaded!")
 
-    async def send_to_log(self, message=None, embed=None):
-        channel_id = os.getenv("LOG_CHANNEL")
-        if channel_id:
-            try:
-                channel = await self.bot.fetch_channel(int(channel_id))
-                await channel.send(content=message, embed=embed)
-            except Exception as e:
-                print(f"❌ Error sending to log channel: {e}")
-
-    async def welcome_func(self, message=None, embed=None):
-        channel_id = os.getenv("WELCOME_CHANNEL")
-        if channel_id:
-            try:
-                channel = await self.bot.fetch_channel(int(channel_id))
-                await channel.send(content=message, embed=embed)
-            except Exception as e:
-                print(f"❌ Error sending to welcome channel: {e}")
+    async def send_log(self, channel_id, embed):
+        channel = self.bot.get_channel(int(channel_id))
+        if channel:
+            await channel.send(embed=embed)
 
     @commands.Cog.listener()
     async def on_ready(self):
-        bot_name = os.getenv("BOT_NAME")
-        version = os.getenv("VERSION")
-        guild_name = os.getenv("GUILD_NAME")
-
-        embed = disnake.Embed(
-            title=f"{bot_name} activated",
-            description=f"{bot_name} says **Hi!**\nThis is version {version}.\nGuild name: {guild_name}",
-            color=disnake.Color.green(),
-            timestamp=dt.datetime.now()
-        )
-        embed.set_thumbnail(url=self.bot.user.display_avatar.url)
-        embed.set_author(name=self.bot.user.name, icon_url=self.bot.user.display_avatar.url)
-        embed.add_field(name="Bot Name", value=bot_name, inline=True)
-        embed.add_field(name="Version", value=version, inline=True)
-        embed.add_field(name="Guild Name", value=guild_name, inline=True)
-        embed.add_field(name="Bot Link", value=f"[Jump to bot](https://discord.com/users/{self.bot.user.id})", inline=False)
-        embed.set_footer(text=f"Started at {dt.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-        embed.set_image(url=self.bot.user.display_avatar.url)
-
-        await self.send_to_log(embed=embed)
+        print(f"🟢 Bot is ready as {self.bot.user}")
 
     @commands.Cog.listener()
     async def on_message_delete(self, message):
-        print("🗑️ Message Deleted")
-        content = message.content or "*Empty*"
-        if len(content) > 1024:
-            content = content[:1021] + "..."
-
-        embed = disnake.Embed(
-            title="🗑️ Message Deleted",
-            description=f"Deleted by: {message.author}",
-            color=disnake.Color.blue(),
-            timestamp=dt.datetime.now()
-        )
-        embed.set_author(name=message.author.name, icon_url=message.author.display_avatar.url)
-        embed.set_thumbnail(url=message.author.display_avatar.url)
-        embed.add_field(name="Author", value=message.author.mention, inline=True)
-        embed.add_field(name="Channel", value=message.channel.mention, inline=True)
-        embed.add_field(name="Message ID", value=message.id, inline=True)
-        embed.add_field(name="Message Content", value=content, inline=False)
-        embed.add_field(name="Message Link", value=f"[Jump to message](https://discord.com/channels/{message.guild.id}/{message.channel.id}/{message.id})", inline=False)
-
-        await self.send_to_log(embed=embed)
+        if message.author.bot:
+            return
+        embed = disnake.Embed(title="🗑️ Message Deleted", color=disnake.Color.red())
+        embed.add_field(name="User", value=f"{message.author} ({message.author.id})", inline=False)
+        embed.add_field(name="Channel", value=message.channel.mention, inline=False)
+        embed.add_field(name="Content", value=message.content or "Embed/attachment", inline=False)
+        embed.timestamp = datetime.utcnow()
+        await self.send_log(os.getenv("LOG_CHANNEL"), embed)
 
     @commands.Cog.listener()
     async def on_message_edit(self, before, after):
-        if before.content == after.content:
+        if before.author.bot or before.content == after.content:
             return
-
-        content_before = before.content or "*Empty*"
-        content_after = after.content or "*Empty*"
-        if len(content_before) > 1024:
-            content_before = content_before[:1021] + "…"
-        if len(content_after) > 1024:
-            content_after = content_after[:1021] + "…"
-
-        embed = disnake.Embed(
-            title="✏️ Message Edited",
-            description=f"Edited by: {before.author}",
-            color=disnake.Color.blue(),
-            timestamp=dt.datetime.now()
-        )
-        embed.set_author(name=before.author.name, icon_url=before.author.display_avatar.url)
-        embed.set_thumbnail(url=before.author.display_avatar.url)
-        embed.add_field(name="Before", value=content_before, inline=False)
-        embed.add_field(name="After", value=content_after, inline=False)
-        embed.add_field(name="Author", value=before.author.mention, inline=True)
-        embed.add_field(name="Channel", value=before.channel.mention, inline=True)
-        embed.add_field(name="Message ID", value=before.id, inline=True)
-
-        await self.send_to_log(embed=embed)
-
-
-    @commands.Cog.listener()
-    async def on_invite_create(self, invite):
-        embed = disnake.Embed(
-            title="Invite created",
-            description=f"A new invite has been created: {invite}",
-            color=disnake.Color.gold(),  # 🟨 Invites
-            timestamp=dt.datetime.now()
-        )
-        await self.send_to_log(embed=embed)
-
-    @commands.Cog.listener()
-    async def on_invite_delete(self, invite):
-        embed = disnake.Embed(
-            title="Invite removed",
-            description=f"An invite has been removed: {invite}",
-            color=disnake.Color.gold(),  # 🟨 Invites
-            timestamp=dt.datetime.now()
-        )
-        embed.add_field(name="Invite Code", value=invite.code, inline=True)
-        embed.add_field(name="Channel", value=invite.channel.mention, inline=True)
-        embed.add_field(name="Inviter", value=invite.inviter.mention, inline=True)
-        embed.add_field(name="Max Uses", value=invite.max_uses, inline=True)
-        embed.add_field(name="Expires At", value=invite.expires_at, inline=True)
-        await self.send_to_log(embed=embed)
-
+        embed = disnake.Embed(title="✏️ Message Edited", color=disnake.Color.orange())
+        embed.add_field(name="User", value=f"{before.author} ({before.author.id})", inline=False)
+        embed.add_field(name="Channel", value=before.channel.mention, inline=False)
+        embed.add_field(name="Before", value=before.content[:1000], inline=False)
+        embed.add_field(name="After", value=after.content[:1000], inline=False)
+        embed.timestamp = datetime.utcnow()
+        await self.send_log(os.getenv("LOG_CHANNEL"), embed)
 
     @commands.Cog.listener()
     async def on_member_join(self, member):
-        embed = disnake.Embed(
-            title="👋 New Member Joined",
-            description=f"{member.mention} just joined **{os.getenv('GUILD_NAME')}**!",
-            color=disnake.Color.blurple(),
-            timestamp=dt.datetime.now()
-        )
-        embed.set_author(name=member.name, icon_url=member.display_avatar.url)
-        embed.set_thumbnail(url=member.display_avatar.url)
-        embed.add_field(name="Account Created At", value=member.created_at.strftime("%Y-%m-%d %H:%M:%S"), inline=True)
-        embed.add_field(name="Joined Server At", value=member.joined_at.strftime("%Y-%m-%d %H:%M:%S"), inline=True)
-        embed.add_field(name="Member ID", value=member.id, inline=True)
-        embed.add_field(name="Member Link", value=f"[Jump to user](https://discord.com/users/{member.id})", inline=False)
-
-        await self.send_to_log(embed=embed)
-        await self.welcome_func(embed=embed)
+        embed = disnake.Embed(title="✅ Member Joined", description=f"{member.mention} ({member.id})", color=disnake.Color.green(), timestamp=datetime.utcnow())
+        await self.send_log(os.getenv("LOG_CHANNEL"), embed)
 
     @commands.Cog.listener()
     async def on_member_remove(self, member):
-        embed = disnake.Embed(
-            title="🚪 Member Left",
-            description=f"{member.mention} has left the server.",
-            color=disnake.Color.red(),
-            timestamp=dt.datetime.now()
-        )
-        embed.set_author(name=member.name, icon_url=member.display_avatar.url)
-        embed.set_thumbnail(url=member.display_avatar.url)
-        embed.add_field(name="Member ID", value=member.id, inline=True)
-        embed.add_field(name="Account Created At", value=member.created_at.strftime("%Y-%m-%d %H:%M:%S"), inline=True)
-        embed.add_field(name="Joined Server At", value=member.joined_at.strftime("%Y-%m-%d %H:%M:%S"), inline=True)
-
-        await self.send_to_log(embed=embed)
+        embed = disnake.Embed(title="❌ Member Left", description=f"{member.mention} ({member.id})", color=disnake.Color.red(), timestamp=datetime.utcnow())
+        await self.send_log(os.getenv("LOG_CHANNEL"), embed)
 
     @commands.Cog.listener()
     async def on_voice_state_update(self, member, before, after):
         changes = []
-
-        # Voice channel join/leave/switch
         if before.channel != after.channel:
-            if not before.channel and after.channel:
-                embed = disnake.Embed(
-                    title="📥 Voice Join",
-                    description=f"{member.mention} is een voice kanaal binnengekomen.",
-                    color=disnake.Color.green()
-                )
-                embed.add_field(name="Kanaal", value=after.channel.name)
-            elif before.channel and not after.channel:
-                embed = disnake.Embed(
-                    title="📤 Voice Leave",
-                    description=f"{member.mention} heeft voice verlaten.",
-                    color=disnake.Color.red()
-                )
-                embed.add_field(name="Kanaal", value=before.channel.name)
+            if after.channel is None:
+                changes.append(f"🔈 Left voice channel: `{before.channel}`")
+            elif before.channel is None:
+                changes.append(f"🔊 Joined voice channel: `{after.channel}`")
             else:
-                embed = disnake.Embed(
-                    title="🔀 Voice Switch",
-                    description=f"{member.mention} is van kanaal veranderd.",
-                    color=disnake.Color.orange()
-                )
-                embed.add_field(name="Van", value=before.channel.name, inline=True)
-                embed.add_field(name="Naar", value=after.channel.name, inline=True)
+                changes.append(f"🔁 Switched voice channel: `{before.channel}` → `{after.channel}`")
 
-            embed.set_footer(text=f"User ID: {member.id}")
-            embed.timestamp = dt.datetime.utcnow()
-            return await self.send_to_log(embed=embed)
-
-        # Mute/unmute
         if before.self_mute != after.self_mute:
-            changes.append("🔇 **Microfoon uitgezet**" if after.self_mute else "🎙 **Microfoon aangezet**")
+            changes.append(f"🎙️ Mic {'muted' if after.self_mute else 'unmuted'}")
 
-        # Deaf/undeaf
         if before.self_deaf != after.self_deaf:
-            changes.append("🔕 **Geluid uitgeschakeld**" if after.self_deaf else "🔔 **Geluid ingeschakeld**")
+            changes.append(f"🔇 Deafened: {after.self_deaf}")
 
-        # Video on/off
         if before.self_video != after.self_video:
-            changes.append("📷 **Camera aangezet**" if after.self_video else "📵 **Camera uitgezet**")
+            changes.append(f"📷 Camera {'enabled' if after.self_video else 'disabled'}")
 
-        # Stream on/off
         if before.self_stream != after.self_stream:
-            changes.append("📡 **Stream gestart**" if after.self_stream else "🛑 **Stream gestopt**")
+            changes.append(f"📺 Streaming {'started' if after.self_stream else 'stopped'}")
 
         if changes:
-            embed = disnake.Embed(
-                title="🎧 Voice Activiteit",
-                description=f"{member.mention} heeft iets aangepast in voice.",
-                color=disnake.Color.blurple()
-            )
-            embed.add_field(name="Wijzigingen", value="\n".join(changes), inline=False)
-            embed.set_footer(text=f"User ID: {member.id}")
-            embed.timestamp = dt.datetime.utcnow()
-            await self.send_to_log(embed=embed)
+            embed = disnake.Embed(title="🎧 Voice Update", description="\n".join(changes), color=disnake.Color.blurple(), timestamp=datetime.utcnow())
+            embed.set_author(name=str(member), icon_url=member.display_avatar.url)
+            await self.send_log(os.getenv("LOG_CHANNEL"), embed)
+
+    @commands.Cog.listener()
+    async def on_member_update(self, before, after):
+        embed = disnake.Embed(title="👤 Member Update", color=disnake.Color.blue(), timestamp=datetime.utcnow())
+        changes = []
+
+        if before.nick != after.nick:
+            changes.append(f"🔤 Nickname: `{before.nick}` → `{after.nick}`")
+
+        before_roles = set(before.roles)
+        after_roles = set(after.roles)
+
+        added = after_roles - before_roles
+        removed = before_roles - after_roles
+
+        if added:
+            changes.append(f"➕ Roles added: {', '.join(role.mention for role in added)}")
+        if removed:
+            changes.append(f"➖ Roles removed: {', '.join(role.mention for role in removed)}")
+
+        if changes:
+            embed.description = "\n".join(changes)
+            embed.set_author(name=str(after), icon_url=after.display_avatar.url)
+            await self.send_log(os.getenv("LOG_CHANNEL"), embed)
+
+    @commands.Cog.listener()
+    async def on_member_ban(self, guild, user):
+        embed = disnake.Embed(title="🚫 Member Banned", description=f"{user.mention} ({user.id})", color=disnake.Color.dark_red(), timestamp=datetime.utcnow())
+        await self.send_log(os.getenv("LOG_CHANNEL"), embed)
+
+    @commands.Cog.listener()
+    async def on_member_unban(self, guild, user):
+        embed = disnake.Embed(title="♻️ Member Unbanned", description=f"{user.mention} ({user.id})", color=disnake.Color.green(), timestamp=datetime.utcnow())
+        await self.send_log(os.getenv("LOG_CHANNEL"), embed)
+
+    @commands.Cog.listener()
+    async def on_guild_update(self, before, after):
+        embed = disnake.Embed(title="🏛️ Server Updated", color=disnake.Color.gold(), timestamp=datetime.utcnow())
+        if before.name != after.name:
+            embed.add_field(name="Naam", value=f"`{before.name}` → `{after.name}`", inline=False)
+        if before.icon != after.icon:
+            embed.set_thumbnail(url=after.icon.url)
+        await self.send_log(os.getenv("LOG_CHANNEL"), embed)
+
+    @commands.Cog.listener()
+    async def on_guild_channel_update(self, before, after):
+        embed = disnake.Embed(title="📢 Channel Updated", description=f"{after.mention} ({after.id})", color=disnake.Color.purple(), timestamp=datetime.utcnow())
+        if before.name != after.name:
+            embed.add_field(name="Naam", value=f"`{before.name}` → `{after.name}`", inline=False)
+        await self.send_log(os.getenv("LOG_CHANNEL"), embed)
+
+    @commands.Cog.listener()
+    async def on_reaction_add(self, reaction, user):
+        if user.bot:
+            return
+        embed = disnake.Embed(title="➕ Reaction Added", description=f"{user.mention} reacted with {reaction.emoji}", color=disnake.Color.green(), timestamp=datetime.utcnow())
+        embed.add_field(name="Channel", value=reaction.message.channel.mention)
+        await self.send_log(os.getenv("LOG_CHANNEL"), embed)
+
+    @commands.Cog.listener()
+    async def on_reaction_remove(self, reaction, user):
+        if user.bot:
+            return
+        embed = disnake.Embed(title="➖ Reaction Removed", description=f"{user.mention} removed {reaction.emoji}", color=disnake.Color.red(), timestamp=datetime.utcnow())
+        embed.add_field(name="Channel", value=reaction.message.channel.mention)
+        await self.send_log(os.getenv("LOG_CHANNEL"), embed)
+
+    @commands.Cog.listener()
+    async def on_thread_create(self, thread):
+        embed = disnake.Embed(title="🧵 Thread Created", description=f"{thread.mention}", color=disnake.Color.green(), timestamp=datetime.utcnow())
+        await self.send_log(os.getenv("LOG_CHANNEL"), embed)
+
+    @commands.Cog.listener()
+    async def on_thread_update(self, before, after):
+        embed = disnake.Embed(title="✏️ Thread Updated", description=f"{after.mention}", color=disnake.Color.orange(), timestamp=datetime.utcnow())
+        await self.send_log(os.getenv("LOG_CHANNEL"), embed)
+
+    @commands.Cog.listener()
+    async def on_thread_delete(self, thread):
+        embed = disnake.Embed(title="❌ Thread Deleted", description=f"{thread.name}", color=disnake.Color.red(), timestamp=datetime.utcnow())
+        await self.send_log(os.getenv("LOG_CHANNEL"), embed)
 
 def setup(bot):
-    bot.add_cog(Serverlogging(bot))
+    bot.add_cog(ServerLogging(bot))
