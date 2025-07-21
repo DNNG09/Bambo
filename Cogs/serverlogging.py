@@ -103,6 +103,33 @@ class Serverlogging(commands.Cog):
 
         await self.send_to_log(embed=embed)
 
+
+    @commands.Cog.listener()
+    async def on_invite_create(self, invite):
+        embed = disnake.Embed(
+            title="Invite created",
+            description=f"A new invite has been created: {invite}",
+            color=disnake.Color.gold(),  # 🟨 Invites
+            timestamp=dt.datetime.now()
+        )
+        await self.send_to_log(embed=embed)
+
+    @commands.Cog.listener()
+    async def on_invite_delete(self, invite):
+        embed = disnake.Embed(
+            title="Invite removed",
+            description=f"An invite has been removed: {invite}",
+            color=disnake.Color.gold(),  # 🟨 Invites
+            timestamp=dt.datetime.now()
+        )
+        embed.add_field(name="Invite Code", value=invite.code, inline=True)
+        embed.add_field(name="Channel", value=invite.channel.mention, inline=True)
+        embed.add_field(name="Inviter", value=invite.inviter.mention, inline=True)
+        embed.add_field(name="Max Uses", value=invite.max_uses, inline=True)
+        embed.add_field(name="Expires At", value=invite.expires_at, inline=True)
+        await self.send_to_log(embed=embed)
+
+
     @commands.Cog.listener()
     async def on_member_join(self, member):
         embed = disnake.Embed(
@@ -139,8 +166,63 @@ class Serverlogging(commands.Cog):
 
     @commands.Cog.listener()
     async def on_voice_state_update(self, member, before, after):
-        # Optioneel: hier kun je voice join/leave logica toevoegen
-        pass
+        changes = []
+
+        # Voice channel join/leave/switch
+        if before.channel != after.channel:
+            if not before.channel and after.channel:
+                embed = disnake.Embed(
+                    title="📥 Voice Join",
+                    description=f"{member.mention} is een voice kanaal binnengekomen.",
+                    color=disnake.Color.green()
+                )
+                embed.add_field(name="Kanaal", value=after.channel.name)
+            elif before.channel and not after.channel:
+                embed = disnake.Embed(
+                    title="📤 Voice Leave",
+                    description=f"{member.mention} heeft voice verlaten.",
+                    color=disnake.Color.red()
+                )
+                embed.add_field(name="Kanaal", value=before.channel.name)
+            else:
+                embed = disnake.Embed(
+                    title="🔀 Voice Switch",
+                    description=f"{member.mention} is van kanaal veranderd.",
+                    color=disnake.Color.orange()
+                )
+                embed.add_field(name="Van", value=before.channel.name, inline=True)
+                embed.add_field(name="Naar", value=after.channel.name, inline=True)
+
+            embed.set_footer(text=f"User ID: {member.id}")
+            embed.timestamp = dt.datetime.utcnow()
+            return await self.send_to_log(embed=embed)
+
+        # Mute/unmute
+        if before.self_mute != after.self_mute:
+            changes.append("🔇 **Microfoon uitgezet**" if after.self_mute else "🎙 **Microfoon aangezet**")
+
+        # Deaf/undeaf
+        if before.self_deaf != after.self_deaf:
+            changes.append("🔕 **Geluid uitgeschakeld**" if after.self_deaf else "🔔 **Geluid ingeschakeld**")
+
+        # Video on/off
+        if before.self_video != after.self_video:
+            changes.append("📷 **Camera aangezet**" if after.self_video else "📵 **Camera uitgezet**")
+
+        # Stream on/off
+        if before.self_stream != after.self_stream:
+            changes.append("📡 **Stream gestart**" if after.self_stream else "🛑 **Stream gestopt**")
+
+        if changes:
+            embed = disnake.Embed(
+                title="🎧 Voice Activiteit",
+                description=f"{member.mention} heeft iets aangepast in voice.",
+                color=disnake.Color.blurple()
+            )
+            embed.add_field(name="Wijzigingen", value="\n".join(changes), inline=False)
+            embed.set_footer(text=f"User ID: {member.id}")
+            embed.timestamp = dt.datetime.utcnow()
+            await self.send_to_log(embed=embed)
 
 def setup(bot):
     bot.add_cog(Serverlogging(bot))
