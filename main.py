@@ -45,6 +45,7 @@ bot.load_extension('Cogs.games')
 bot.load_extension('Cogs.tools')
 bot.load_extension('Cogs.ticketing_tool')
 bot.load_extension('Cogs.roles')
+bot.load_extension('Cogs.youtube')
 
 
 bot.run(os.getenv('TOKEN'))

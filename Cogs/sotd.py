@@ -130,7 +130,7 @@ class StatementOfTheDay(commands.Cog):
     @tasks.loop(seconds=5)
     async def sotd_loop(self):
         now = datetime.now()
-        if now.strftime("%H:%M") == "18:08" and now.date() != self.sent_today:
+        if now.strftime("%H:%M") == "18:00" and now.date() != self.sent_today:
             channel = self.bot.get_channel(self.sotd_channel_id)
             if channel:
                 statement = random.choice(self.statements)
