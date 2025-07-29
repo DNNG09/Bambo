@@ -2,3 +2,4 @@ disnake
 mysql.connector
 datetime
 python-dotenv
+google-api-python-client
