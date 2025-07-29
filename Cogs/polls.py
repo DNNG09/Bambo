@@ -205,7 +205,7 @@ class Poll(commands.Cog):
         )
 
 
-    @has_permissions(disnake.Permissions.administrator)
+    @has_permissions(administrator=True)
     @commands.slash_command(
         name="pollresults", description="Laat de huidige pollresultaten zien (privé)."
     )
@@ -224,7 +224,7 @@ class Poll(commands.Cog):
         )
         await inter.response.send_message(embed=embed, ephemeral=True)
 
-    @has_permissions(disnake.Permissions.administrator)
+    @has_permissions(administrator=True)
     @commands.slash_command(name="pollvoters", description="Bekijk wie op wat heeft gestemd (alleen zichtbaar voor jou).")
     async def poll_voters(self, inter: disnake.ApplicationCommandInteraction):
         view = active_polls.get(inter.guild.id)
