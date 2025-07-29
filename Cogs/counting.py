@@ -53,6 +53,28 @@ class Counting(commands.Cog):
             self.last_user_id = None
             return
 
+        if number == 69:
+            await message.add_reaction("🍆")
+
+        if number == 420:
+            await message.add_reaction("🌿")
+        
+        if number == 666:
+            await message.add_reaction("😈")
+
+        if number == 777:
+            await message.add_reaction("☘️")
+        
+        if number == 1337:
+            await message.add_reaction("💻")
+
+        if number == 1234:
+            await message.add_reaction("🔢")
+
+        if number == 911:
+            await message.add_reaction("✈️")
+            await message.add_reaction("🏨")
+
         if number != self.last_number + 1:
             await message.add_reaction("❌")
             await message.reply(f"❌ Verkeerd getal! Het volgende juiste nummer was **{self.last_number + 1}**.\n🔁 De telling is gereset.")
